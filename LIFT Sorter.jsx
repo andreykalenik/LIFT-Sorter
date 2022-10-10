@@ -1,4 +1,7 @@
-﻿var pdfFiles = Folder.selectDialog().getFiles( /\.pdf$/i );
+﻿#target indesign
+#targetengine "main"
+
+var pdfFiles = Folder.selectDialog().getFiles( /\.pdf$/i );
 if(pdfFiles == "" || pdfFiles == null)  
   exit(0);
 var name = [];
@@ -101,7 +104,7 @@ var statictext2 = group3.add("statictext", undefined, undefined, {name: "statict
 
 
 var edittext1 = group3.add('edittext {properties: {name: "edittext1", multiline: true, scrollable: true}}'); 
-    edittext1.characters = 90;
+    edittext1.characters = 50;
     edittext1.text = name; 
 
 // GROUP4
@@ -232,7 +235,7 @@ var sortName = edittext1.text.split ("\n");
 var sortPage1 = edittext2.text.split ("\n");
 var sortPage2 = edittext3.text.split ("\n");
 var sortSize = edittext4.text.split ("\n");    
-
+if(){}
 
 if(label == true){
     var labelDoc = app.documents.add();
