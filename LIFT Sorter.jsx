@@ -10,6 +10,7 @@ var page2 =[];
 var size =[];
 var label = false;
 var runKey = false;
+var outputArray=[1];
 
 var typeArray = ["День 1 Левая","День 1 Правая","-", "День 2 Левая","День 2 Правая","-","День 3 Левая","День 3 Правая","-","БЦ","элит","Общежитие","-","Жодино","Борисов"]; 
 var typeColorArray = [[40,0,0,0],[0,40,0,0],"-",[40,0,0,0],[0,40,0,0],"-",[40,0,0,0],[0,40,0,0],"-",[40,40,0,0],[0,40,40,0],[40,0,40,0],"-",[0,0,0,0],[0,0,0,0]];
@@ -36,12 +37,12 @@ for (i = 0; i < pdfFiles.length; i++) {
           size.push('\n');
 }
 
-
+/*
 function compareNumbers(a, b) {
   return a - b;
 }
 name.sort(compareNumbers);
-
+*/
 
 
 name=name.toString().replace(/[,]/g, "");
@@ -174,10 +175,17 @@ var button1 = group7.add("button", undefined,  "Старт",  {name: "ok"});
 //=======
 button1.onClick= function(){
     dialog.close ();
+    if(label == true){
+        runKey = false;
+        }
+   runKey =true;
     }
 
 checkbox1.onClick= function(){
     label = true;
+      if(label == true){
+        label = false;
+        }
             } 
 dropdown1.onChange= function(){
                switch (this.selection.index){  
@@ -235,7 +243,96 @@ var sortName = edittext1.text.split ("\n");
 var sortPage1 = edittext2.text.split ("\n");
 var sortPage2 = edittext3.text.split ("\n");
 var sortSize = edittext4.text.split ("\n");    
-if(){}
+
+if(runKey == true){
+    for(var j = 0; j < sortName.length-1; j++){
+        getSizePDF (pdfFiles[j]);
+        /*
+        $.writeln ("файл " +j);
+        $.writeln ("sortPage1 " +sortPage1[j]);
+        $.writeln ("sortPage2 " +sortPage2[j]);
+        */
+        if (sortPage1[j]>0 && sortPage2[j]>0){
+            pagesPDF=3;
+            }else{
+                pagesPDF=2;
+                }
+        myDocument = app.documents.add();
+           
+       // myDocument.windows[0].minimize();
+                with (myDocument.viewPreferences){
+                horizontalMeasurementUnits = MeasurementUnits.millimeters;
+                verticalMeasurementUnits = MeasurementUnits.millimeters;
+                strokeMeasurementUnits = MeasurementUnits.points;
+                   }
+                    with(myDocument.textDefaults){
+                            pointSize = 36;
+                            }
+                 with(myDocument.documentPreferences){
+                    masterTextFrame = false; // - не создаем. Если masterTextFrame = true, то он будет создаваться
+                    facingPages = false; // при true документ будет создан разворотами, при false - из отдельных страниц
+                    pageHeight = hPDF;
+                    pageWidth = wPDF;
+                    pageOrientation = PageOrientation.portrait; // или pageOrientation = PageOrientation.portrait;
+                    
+                    pagesPerDocument = pagesPDF;
+                    startPageNumber = 1; // Этот параметр лежит в пределах 1-999999.
+                    intent = DocumentIntentOptions.PRINT_INTENT; 
+                   } 
+
+        for( var a= 2; a < pagesPDF+1 ; a++){
+            app.pdfPlacePreferences.pageNumber = a;
+            myDocument.pages[a-1].place(File(pdfFiles[j]), [0,0]); 
+            }
+         myDocument.colors.add({name : "BG", colorValue : typeColor , model : ColorModel.PROCESS ,space : ColorSpace.CMYK });
+
+                    var myTextFrame = myDocument.pages[0].textFrames.add();
+                    myTextFrame.geometricBounds = ["0mm", "0mm", "450mm", "320mm"];
+                    myTextFrame.name  = "nameFrame";
+                    
+                    if(sortPage2[j]==""){
+                        sortPage2[j] = 0;
+                        }
+                    var allPages = +sortPage1[j] + +sortPage2[j];
+                    
+                    
+                    if(sortSize[j].length < 2){
+                        sortSize[j] = "A3"
+                        }
+                    myTextFrame.contents  = type + "\n"+ sortName[j] + "\n"+"Тираж "+allPages+ " шт\n"+"Форамат "+ sortSize[j];
+                    myTextFrame.fillColor = myDocument.swatches.item("BG");
+                    myTextFrame.fillTint = 100;
+                    myTextFrame.textFramePreferences.insetSpacing = ["50mm","50mm","50mm","50mm"];
+                    
+                   
+                 if(sortPage1[j]>0 && sortPage2[j]>0 ){
+                     for (var b =0; b < sortPage1[j]; b++){
+                         outputArray.push (2);
+                         }
+                     for (var b =0; b < sortPage2[j]; b++){
+                         outputArray.push (3);
+                         }                     
+                     }  
+                 
+                if(sortPage1[j]>0 && sortPage2[j] == 0 ){
+                     for (var b =0; b < sortPage1[j]; b++){
+                         outputArray.push (2);
+                         }                     
+                     }  
+                 
+                 if(sortPage2[j]>0 && sortPage1[j] == 0 ){
+                     for (var b =0; b < sortPage2[j]; b++){
+                         outputArray.push (2);
+                         }                     
+                     }  
+                 
+                 var ww = outputArray.toString();
+                pdfExportSet (ww);
+                var saveFile = new File(File(tmpFolder +"/"+ sortName[j] +".pdf"));  
+                myDocument.exportFile(ExportFormat.pdfType, saveFile, false);
+                outputArray=[1];       
+        }
+    }
 
 if(label == true){
     var labelDoc = app.documents.add();
@@ -296,4 +393,148 @@ function create_pdf (path_PDF_folder, name_PDF, viewPDF){
          saveFile.execute();
          }
      myDocument.close(SaveOptions.NO);    
+}
+
+function getSizePDF(myPDFFile){
+myDocument = app.documents.add();
+    myDocument.windows[0].minimize();
+  with (myDocument.viewPreferences){
+            horizontalMeasurementUnits = MeasurementUnits.millimeters;
+            verticalMeasurementUnits = MeasurementUnits.millimeters;
+           }
+myPage = myDocument.pages.item(0);  
+myPlacePDF(myDocument, myPage, myPDFFile);  
+   
+hPDF = (myDocument.allGraphics[0].geometricBounds[2]) - (myDocument.allGraphics[0].geometricBounds[0]);
+wPDF = (myDocument.allGraphics[0].geometricBounds[3]) - (myDocument.allGraphics[0].geometricBounds[1]);
+ 
+wPDF= Math.round(wPDF);
+hPDF = Math.round(hPDF);
+
+  myDocument.close(SaveOptions.no);
+function myPlacePDF(myDocument, myPage, myPDFFile){  
+	var myPDFPage =1;
+	app.pdfPlacePreferences.pdfCrop = PDFCrop.cropPDF;
+	var myCounter = 1;
+	var myBreak = false;
+        myPDFPage = myPage.place(File(myPDFFile), [0,0])[0];
+}
+}
+function getPagesPDF(myPDFFile){  
+var myDocument = app.documents.add();
+myDocument.windows[0].minimize();
+var myPage = myDocument.pages.item(0); 
+var myPDFPage;
+	app.pdfPlacePreferences.pdfCrop = PDFCrop.cropMedia;
+    
+
+ 
+function pageCount(pagesPDFRange, v,startPageNumberpagesPDF){
+var graphicFrame = app.selection[0];  
+var pdfFile = myPDFFile;
+startPageNumberpagesPDF = startPageNumberpagesPDF; 
+var doc = app.documents[0];  
+
+
+  
+for(var n=startPageNumberpagesPDF+1;n<=startPageNumberpagesPDF+pagesPDFRange; n=n+v)  
+{  
+
+    var tempFrame = doc.rectangles.add({geometricBounds : [0,0,100,100]});  
+    app.pdfPlacePreferences.pageNumber = n;   
+    tempFrame.place(pdfFile,false,undefined);  
+    var currentPageNumber = tempFrame.getElements()[0].graphics[0].pdfAttributes.pageNumber;  
+    tempFrame.remove(); 
+    if(currentPageNumber == 1)  
+    {  
+        //$.writeln( "Number of pages in PDF:"+"\t"+(n-v) ); 
+    pagesPDF = n-v;
+        break;  
+    };  
+  
+
+    if(n==startPageNumberpagesPDF+pagesPDFRange)  
+    {  
+        //$.writeln( "End of pagesPDF range reached. Last pagesPDFed page number:"+"\t"+(n) );  
+    pagesPDF = n;
+    };  
+
+};
+}
+try{
+    pageCount (1500, 100, 1);
+    pageCount (1500, 10, pagesPDF);
+        }
+catch(e){
+    //pageCount (1500, 10, pagesPDF);
+    pagesPDF = 1;
+    }
+finally{
+    pageCount (1500, 1, pagesPDF);
+    myDocument.close(SaveOptions.no);
+    }
+
+
+}
+
+function pdfExportSet (PageRange){
+            with(app.pdfExportPreferences){
+    	pageRange = PageRange;
+    	acrobatCompatibility = AcrobatCompatibility.acrobat8;
+    	exportGuidesAndGrids = false;
+    	exportLayers = false;
+    	exportNonPrintingObjects = false;
+    	exportReaderSpreads = false;
+    	generateThumbnails = false;
+    	try{
+    		ignoreSpreadOverrides = false;
+    	}
+    	catch(e){}
+    	includeBookmarks = false;
+    	includeHyperlinks = false;
+    	includeICCProfiles = false;
+    	includeSlugWithPDF = false;
+    	includeStructure = false;
+    	interactiveElementsOption = InteractiveElementsOptions.doNotInclude;
+    	subsetFontsBelow = 100;
+        /*
+    	colorBitmapCompression = BitmapCompression.zip;
+    	colorBitmapQuality = CompressionQuality.eightBit;
+    	colorBitmapSampling = Sampling.none;
+        */
+        colorBitmapCompression=  BitmapCompression.AUTO_COMPRESSION;
+        colorBitmapSampling= Sampling.BICUBIC_DOWNSAMPLE;
+        colorBitmapSamplingDPI = 280;
+        colorTileSize= 128;
+    	grayscaleBitmapCompression = BitmapCompression.zip;
+    	grayscaleBitmapQuality = CompressionQuality.eightBit;
+    	grayscaleBitmapSampling = Sampling.none;
+    	monochromeBitmapCompression = BitmapCompression.zip;
+    	monochromeBitmapSampling = Sampling.none;
+    	compressionType = PDFCompressionType.COMPRESS_OBJECTS;
+    	compressTextAndLineArt = true;
+		cropImagesToFrames = true;
+		optimizePDF = false;
+    	colorBars = false;
+    	colorTileSize = 128;
+    	grayTileSize = 128;
+    	cropMarks = false;
+    	omitBitmaps = false;
+    	omitEPS = false;
+    	omitPDF = false;
+    	pageInformationMarks = false;
+    	pageMarksOffset = "12 pt";
+    	pdfColorSpace = PDFColorSpace.unchangedColorSpace;
+         includeICCProfiles = ICCProfiles.INCLUDE_NONE;
+    	pdfMarkType = 1147563124;
+    	printerMarkWeight = PDFMarkWeight.p125pt;
+    	registrationMarks = false;
+    	try{
+    		simulateOverprint = false;
+    	}
+    	catch(e){}
+    	useDocumentBleedWithPDF = true;
+    	viewPDF = false;
+    }
+    
 }
