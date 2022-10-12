@@ -259,7 +259,7 @@ if(runKey == true){
                 }
         myDocument = app.documents.add();
            
-       // myDocument.windows[0].minimize();
+       myDocument.windows[0].minimize();
                 with (myDocument.viewPreferences){
                 horizontalMeasurementUnits = MeasurementUnits.millimeters;
                 verticalMeasurementUnits = MeasurementUnits.millimeters;
@@ -299,7 +299,7 @@ if(runKey == true){
                     if(sortSize[j].length < 2){
                         sortSize[j] = "A3"
                         }
-                    myTextFrame.contents  = type + "\n"+ sortName[j] + "\n"+"Тираж "+allPages+ " шт\n"+"Форамат "+ sortSize[j];
+                    myTextFrame.contents  = "Вид - " + type + "\n"+ "№"+ sortName[j] + "\n"+"Тираж "+allPages+ " шт\n"+"Форамат "+ sortSize[j];
                     myTextFrame.fillColor = myDocument.swatches.item("BG");
                     myTextFrame.fillTint = 100;
                     myTextFrame.textFramePreferences.insetSpacing = ["50mm","50mm","50mm","50mm"];
@@ -330,8 +330,12 @@ if(runKey == true){
                 pdfExportSet (ww);
                 var saveFile = new File(File(tmpFolder +"/"+ sortName[j] +".pdf"));  
                 myDocument.exportFile(ExportFormat.pdfType, saveFile, false);
-                outputArray=[1];       
+                outputArray=[1];      
+                myDocument.close(SaveOptions.no);
+
         }
+     alert ("Скрипт закончил работу.", "Готово!", )
+     tmpFolder.execute();
     }
 
 if(label == true){
@@ -371,7 +375,7 @@ if(label == true){
                     if(sortSize[i].length < 2){
                         sortSize[i] = "A3"
                         }
-                    myTextFrame.contents  = type + "\n"+ sortName[i] + "\n"+"Тираж "+allPages+ " шт\n"+"Форамат "+ sortSize[i];
+                    myTextFrame.contents  ="Вид - " + type + "\n"+ "№" + sortName[i] + "\n"+"Тираж "+allPages+ " шт\n"+"Форамат "+ sortSize[i];
                     myTextFrame.fillColor = labelDoc.swatches.item("BG");
                     myTextFrame.fillTint = 100;
                     myTextFrame.textFramePreferences.insetSpacing = ["50mm","50mm","50mm","50mm"];
