@@ -1,7 +1,7 @@
 ﻿#target indesign
 #targetengine "main"
 
-var pdfFiles = Folder.selectDialog().getFiles( /\.pdf$/i );
+var pdfFiles = Folder.selectDialog().getFiles("*.pdf" || file.type == "PDF " );
 if(pdfFiles == "" || pdfFiles == null)  
   exit(0);
 var name = [];
@@ -29,7 +29,29 @@ function checkFolder (pathToFolder){
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+function timer() {
+  this.startTime = null;
+  this.endTime = null;
+}
+timer.prototype.start = function () {
+  this.startTime = new Date();
+}
+timer.prototype.stop = function () {
+  this.endTime = new Date();
+}
+timer.prototype.alert = function () {
+  if (this.startTime == null) {
+    alert("Таймер не был запущен!");
+    return null;
+  }
+  if (this.endTime == null) {
+    this.stop();
+  }
+  $.writeln("Выполнено за " + String((this.endTime - this.startTime)/1000) + " секунд.")
+}
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 for (i = 0; i < pdfFiles.length; i++) { 
           name.push(pdfFiles[i].displayName.toString().replace(/[.pdf]/g, "") + '\n');
           page1.push( 0 + '\n');
@@ -88,7 +110,7 @@ var checkbox1 = group1.add("checkbox", undefined, undefined, {name: "checkbox1"}
 // ======
 var group2 = dialog.add("group", undefined, {name: "group2"}); 
     group2.orientation = "row"; 
-    group2.alignChildren = ["fill","fill"]; 
+    group2.alignChildren = ["fill","top"]; 
     group2.spacing = 10; 
     group2.margins = 0; 
 
@@ -96,7 +118,7 @@ var group2 = dialog.add("group", undefined, {name: "group2"});
 // ======
 var group3 = group2.add("group", undefined, {name: "group3"}); 
     group3.orientation = "column"; 
-    group3.alignChildren = ["left","top"]; 
+    group3.alignChildren = ["left","fill"]; 
     group3.spacing = 10; 
     group3.margins = 0; 
 
@@ -112,12 +134,12 @@ var edittext1 = group3.add('edittext {properties: {name: "edittext1", multiline:
 // ======
 var group4 = group2.add("group", undefined, {name: "group4"}); 
     group4.orientation = "column"; 
-    group4.alignChildren = ["left","top"]; 
+    group4.alignChildren = ["left","fill"]; 
     group4.spacing = 10; 
     group4.margins = 0; 
 
 var statictext3 = group4.add("statictext", undefined, undefined, {name: "statictext3"}); 
-    statictext3.text = "стр 1"; 
+    statictext3.text = "тираж"; 
 
 var edittext2 = group4.add('edittext {properties: {name: "edittext2", multiline: true, scrollable: true}}'); 
     edittext2.text = page1; 
@@ -125,6 +147,7 @@ var edittext2 = group4.add('edittext {properties: {name: "edittext2", multiline:
 
 // GROUP5
 // ======
+/*
 var group5 = group2.add("group", undefined, {name: "group5"}); 
     group5.orientation = "column"; 
     group5.alignChildren = ["left","top"]; 
@@ -137,19 +160,19 @@ var statictext4 = group5.add("statictext", undefined, undefined, {name: "statict
 var edittext3 = group5.add('edittext {properties: {name: "edittext3", multiline: true, scrollable: true}}'); 
     edittext3.text = page2; 
     edittext3.characters = 4;
-    
+  */  
 // GROUP8
 // ======
 var group8 = group2.add("group", undefined, {name: "group8"}); 
     group8.orientation = "column"; 
-    group8.alignChildren = ["left","top"]; 
+    group8.alignChildren = ["left","fill"]; 
     group8.spacing = 10; 
     group8.margins = 0; 
 
 var statictext5 = group8.add("statictext", undefined, undefined, {name: "statictext4"}); 
     statictext5.text = "формат"; 
 
-var edittext4 = group8.add('edittext {properties: {name: "edittext3", multiline: true, scrollable: true}}'); 
+var edittext4 = group8.add('edittext {properties: {name: "edittext4", multiline: true, scrollable: true}}'); 
     edittext4.text = size; 
     edittext4.characters = 8;
 
@@ -241,10 +264,12 @@ dialog.show();
 
 var sortName = edittext1.text.split ("\n");
 var sortPage1 = edittext2.text.split ("\n");
-var sortPage2 = edittext3.text.split ("\n");
 var sortSize = edittext4.text.split ("\n");    
 
 if(runKey == true){
+  var myTimer = new timer();
+  myTimer.start();
+    
     for(var j = 0; j < sortName.length-1; j++){
         getSizePDF (pdfFiles[j]);
         /*
@@ -252,10 +277,8 @@ if(runKey == true){
         $.writeln ("sortPage1 " +sortPage1[j]);
         $.writeln ("sortPage2 " +sortPage2[j]);
         */
-        if (sortPage1[j]>0 && sortPage2[j]>0){
-            pagesPDF=3;
-            }else{
-                pagesPDF=2;
+        if (sortPage1[j]>0 ){
+            pagesPDF=2;
                 }
         myDocument = app.documents.add();
            
@@ -287,44 +310,29 @@ if(runKey == true){
          myDocument.colors.add({name : "BG", colorValue : typeColor , model : ColorModel.PROCESS ,space : ColorSpace.CMYK });
 
                     var myTextFrame = myDocument.pages[0].textFrames.add();
-                    myTextFrame.geometricBounds = ["0mm", "0mm", "450mm", "320mm"];
+                    myTextFrame.geometricBounds = ["5mm", "5mm", hPDF - 5 +"mm",  wPDF - 5 +"mm"];
                     myTextFrame.name  = "nameFrame";
                     
-                    if(sortPage2[j]==""){
-                        sortPage2[j] = 0;
-                        }
-                    var allPages = +sortPage1[j] + +sortPage2[j];
+                    var allPages = +sortPage1[j] 
                     
                     
                     if(sortSize[j].length < 2){
                         sortSize[j] = "A3"
                         }
-                    myTextFrame.contents  = "Вид - " + type + "\n"+ "№"+ sortName[j] + "\n"+"Тираж "+allPages+ " шт\n"+"Форамат "+ sortSize[j];
+                    myTextFrame.contents  = "Вид - " + type + "\n"+ "№"+ sortName[j] + "\n"+"Тираж "+allPages+ " шт\n"+"Формат "+ sortSize[j];
                     myTextFrame.fillColor = myDocument.swatches.item("BG");
                     myTextFrame.fillTint = 100;
                     myTextFrame.textFramePreferences.insetSpacing = ["50mm","50mm","50mm","50mm"];
                     
                    
-                 if(sortPage1[j]>0 && sortPage2[j]>0 ){
+                 if(sortPage1[j]>0 ){
                      for (var b =0; b < sortPage1[j]; b++){
                          outputArray.push (2);
                          }
-                     for (var b =0; b < sortPage2[j]; b++){
-                         outputArray.push (3);
-                         }                     
                      }  
                  
-                if(sortPage1[j]>0 && sortPage2[j] == 0 ){
-                     for (var b =0; b < sortPage1[j]; b++){
-                         outputArray.push (2);
-                         }                     
-                     }  
-                 
-                 if(sortPage2[j]>0 && sortPage1[j] == 0 ){
-                     for (var b =0; b < sortPage2[j]; b++){
-                         outputArray.push (2);
-                         }                     
-                     }  
+
+
                  
                  var ww = outputArray.toString();
                 pdfExportSet (ww);
@@ -334,8 +342,10 @@ if(runKey == true){
                 myDocument.close(SaveOptions.no);
 
         }
+        myTimer.stop();
+        myTimer.alert();
      alert ("Скрипт закончил работу.", "Готово!", )
-     tmpFolder.execute();
+
     }
 
 if(label == true){
@@ -363,19 +373,17 @@ if(label == true){
                     var lastPages = labelDoc.pages.add(LocationOptions.AT_END);
                  
                     var myTextFrame = lastPages.textFrames.add();
-                    myTextFrame.geometricBounds = ["0mm", "0mm", "450mm", "320mm"];
+                    myTextFrame.geometricBounds = ["5mm", "5mm", hPDF - 5 +"mm",  wPDF - 5 +"mm"];
                     myTextFrame.name  = "nameFrame";
                     
-                    if(sortPage2[i]==""){
-                        sortPage2[i] = 0;
-                        }
-                    var allPages = +sortPage1[i] + +sortPage2[i];
+
+                    var allPages = +sortPage1[i]
                     
                     
                     if(sortSize[i].length < 2){
                         sortSize[i] = "A3"
                         }
-                    myTextFrame.contents  ="Вид - " + type + "\n"+ "№" + sortName[i] + "\n"+"Тираж "+allPages+ " шт\n"+"Форамат "+ sortSize[i];
+                    myTextFrame.contents  ="Вид - " + type + "\n"+ "№" + sortName[i] + "\n"+"Тираж "+allPages+ " шт\n"+"Формат "+ sortSize[i];
                     myTextFrame.fillColor = labelDoc.swatches.item("BG");
                     myTextFrame.fillTint = 100;
                     myTextFrame.textFramePreferences.insetSpacing = ["50mm","50mm","50mm","50mm"];
