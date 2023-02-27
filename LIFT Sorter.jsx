@@ -10,7 +10,7 @@ var page2 =[];
 var size =[];
 var label = false;
 var runKey = false;
-var outputArray=[1];
+
 
 var typeArray = ["День 1 Левая","День 1 Правая","-", "День 2 Левая","День 2 Правая","-","День 3 Левая","День 3 Правая","-","БЦ","элит","Общежитие","-","Жодино","Борисов"]; 
 var typeColorArray = [[40,0,0,0],[0,40,0,0],"-",[40,0,0,0],[0,40,0,0],"-",[40,0,0,0],[0,40,0,0],"-",[40,40,0,0],[0,40,40,0],[40,0,40,0],"-",[0,0,0,0],[0,0,0,0]];
@@ -326,19 +326,16 @@ if(runKey == true){
                     
                    
                  if(sortPage1[j]>0 ){
-                     for (var b =0; b < sortPage1[j]; b++){
-                         outputArray.push (2);
-                         }
+                     var myPage = myDocument.pages[1];
+                     for (i = 0; i < sortPage1[j]-1 ; i++) {
+                        myPage = myPage.duplicate();
+                        }  
+                    
                      }  
-                 
 
-
-                 
-                 var ww = outputArray.toString();
-                pdfExportSet (ww);
+                pdfExportSet ();
                 var saveFile = new File(File(tmpFolder +"/"+ sortName[j] +".pdf"));  
-                myDocument.exportFile(ExportFormat.pdfType, saveFile, false);
-                outputArray=[1];      
+                myDocument.exportFile(ExportFormat.pdfType, saveFile, false);   
                 myDocument.close(SaveOptions.no);
 
         }
@@ -489,9 +486,9 @@ finally{
 
 }
 
-function pdfExportSet (PageRange){
+function pdfExportSet (){
             with(app.pdfExportPreferences){
-    	pageRange = PageRange;
+    	pageRange = PageRange.allPages;
     	acrobatCompatibility = AcrobatCompatibility.acrobat8;
     	exportGuidesAndGrids = false;
     	exportLayers = false;
@@ -514,18 +511,18 @@ function pdfExportSet (PageRange){
     	colorBitmapQuality = CompressionQuality.eightBit;
     	colorBitmapSampling = Sampling.none;
         */
-        colorBitmapCompression=  BitmapCompression.AUTO_COMPRESSION;
-        colorBitmapSampling= Sampling.BICUBIC_DOWNSAMPLE;
-        colorBitmapSamplingDPI = 280;
+        colorBitmapCompression=  BitmapCompression.NONE;
+        colorBitmapSampling= Sampling.NONE ;
+        //colorBitmapSamplingDPI = 280;
         colorTileSize= 128;
-    	grayscaleBitmapCompression = BitmapCompression.zip;
-    	grayscaleBitmapQuality = CompressionQuality.eightBit;
-    	grayscaleBitmapSampling = Sampling.none;
-    	monochromeBitmapCompression = BitmapCompression.zip;
-    	monochromeBitmapSampling = Sampling.none;
-    	compressionType = PDFCompressionType.COMPRESS_OBJECTS;
+    	grayscaleBitmapCompression = BitmapCompression.NONE ;
+    	//grayscaleBitmapQuality = CompressionQuality.NONE ;
+    	grayscaleBitmapSampling = Sampling.NONE ;
+    	monochromeBitmapCompression = BitmapCompression.NONE ;
+    	monochromeBitmapSampling = Sampling.NONE ;
+    	compressionType = PDFCompressionType.COMPRESS_STRUCTURE;
     	compressTextAndLineArt = true;
-		cropImagesToFrames = true;
+		cropImagesToFrames = false;
 		optimizePDF = false;
     	colorBars = false;
     	colorTileSize = 128;
