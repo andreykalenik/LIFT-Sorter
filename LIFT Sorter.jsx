@@ -13,7 +13,7 @@ var runKey = false;
 var timer = false;
 
 
-var typeArray = ["День 1 Левая","День 1 Правая","-", "День 2 Левая","День 2 Правая","-","День 3 Левая","День 3 Правая","-","БЦ","элит","Общежитие","-","Жодино","Борисов","-","Произвольное значение"]; 
+var typeArray = ["День 1 Левая","День 1 Правая","-", "День 2 Левая","День 2 Правая","-","День 3 Левая","День 3 Правая","-","БЦ","элит","Общежитие","-","Жодино","Борисов","-","Другое"]; 
 var typeColorArray = [[40,0,0,0],[0,40,0,0],"-",[40,0,0,0],[0,40,0,0],"-",[40,0,0,0],[0,40,0,0],"-",[40,40,0,0],[0,40,40,0],[40,0,40,0],"-",[0,0,0,0],[0,0,0,0],"-",[0,0,0,0]];
 
 var type = typeArray[0];
@@ -34,23 +34,24 @@ function timer() {
   this.startTime = null;
   this.endTime = null;
 }
-timer.prototype.start = function () {
-  this.startTime = new Date();
+if (timer == true){
+        timer.prototype.start = function () {
+          this.startTime = new Date();
+        }
+        timer.prototype.stop = function () {
+          this.endTime = new Date();
+        }
+        timer.prototype.alert = function () {
+          if (this.startTime == null) {
+            alert("Таймер не был запущен!");
+            return null;
+          }
+          if (this.endTime == null) {
+            this.stop();
+          }
+          $.writeln("Выполнено за " + String((this.endTime - this.startTime)/1000) + " секунд.")
+        }
 }
-timer.prototype.stop = function () {
-  this.endTime = new Date();
-}
-timer.prototype.alert = function () {
-  if (this.startTime == null) {
-    alert("Таймер не был запущен!");
-    return null;
-  }
-  if (this.endTime == null) {
-    this.stop();
-  }
-  $.writeln("Выполнено за " + String((this.endTime - this.startTime)/1000) + " секунд.")
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 for (i = 0; i < pdfFiles.length; i++) { 
@@ -256,7 +257,11 @@ dropdown1.onChange= function(){
                     case 14 :  
                           type = typeArray[14];
                           typeColor = typeColorArray[14]; 
-                          break;                          
+                          break;            
+                    case 16 :  
+                          type = prompt ("Введи название этого вида", undefined, "Другой вид");
+                          typeColor = typeColorArray[16]; 
+                          break;       
 
                 }
             }
