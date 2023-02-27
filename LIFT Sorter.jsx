@@ -10,10 +10,11 @@ var page2 =[];
 var size =[];
 var label = false;
 var runKey = false;
+var timer = false;
 
 
-var typeArray = ["День 1 Левая","День 1 Правая","-", "День 2 Левая","День 2 Правая","-","День 3 Левая","День 3 Правая","-","БЦ","элит","Общежитие","-","Жодино","Борисов"]; 
-var typeColorArray = [[40,0,0,0],[0,40,0,0],"-",[40,0,0,0],[0,40,0,0],"-",[40,0,0,0],[0,40,0,0],"-",[40,40,0,0],[0,40,40,0],[40,0,40,0],"-",[0,0,0,0],[0,0,0,0]];
+var typeArray = ["День 1 Левая","День 1 Правая","-", "День 2 Левая","День 2 Правая","-","День 3 Левая","День 3 Правая","-","БЦ","элит","Общежитие","-","Жодино","Борисов","-","Произвольное значение"]; 
+var typeColorArray = [[40,0,0,0],[0,40,0,0],"-",[40,0,0,0],[0,40,0,0],"-",[40,0,0,0],[0,40,0,0],"-",[40,40,0,0],[0,40,40,0],[40,0,40,0],"-",[0,0,0,0],[0,0,0,0],"-",[0,0,0,0]];
 
 var type = typeArray[0];
 var typeColor = typeColorArray[0]; 
@@ -267,8 +268,10 @@ var sortPage1 = edittext2.text.split ("\n");
 var sortSize = edittext4.text.split ("\n");    
 
 if(runKey == true){
-  var myTimer = new timer();
-  myTimer.start();
+    if (timer ==true){
+          var myTimer = new timer();
+          myTimer.start();
+  }
     
     for(var j = 0; j < sortName.length-1; j++){
         getSizePDF (pdfFiles[j]);
@@ -339,8 +342,12 @@ if(runKey == true){
                 myDocument.close(SaveOptions.no);
 
         }
+    
+    if(timer == true){
         myTimer.stop();
         myTimer.alert();
+        }
+    
      alert ("Скрипт закончил работу.", "Готово!", )
 
     }
