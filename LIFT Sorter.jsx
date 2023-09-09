@@ -13,13 +13,18 @@ var runKey = false;
 var timer = false;
 
 
-var typeArray = ["День 1 Левая","День 1 Правая","-", "День 2 Левая","День 2 Правая","-","День 3 Левая","День 3 Правая","-","БЦ","элит","Общежитие","-","Жодино","Борисов","-","Другое"]; 
-var typeColorArray = [[40,0,0,0],[0,40,0,0],"-",[40,0,0,0],[0,40,0,0],"-",[40,0,0,0],[0,40,0,0],"-",[40,40,0,0],[0,40,40,0],[40,0,40,0],"-",[0,0,0,0],[0,0,0,0],"-",[0,0,0,0]];
+var typeArray = ["День 1 Левая","День 1 Правая","-", "День 2 Левая","День 2 Правая","-","День 3 Левая","День 3 Правая","-","БЦ","элит","Общежитие","-","Жодино","Борисов","Барановичи","-","Другое"]; 
+var typeColorArray = [[40,0,0,0],[0,40,0,0],"-",[40,0,0,0],[0,40,0,0],"-",[40,0,0,0],[0,40,0,0],"-",[40,40,0,0],[0,40,40,0],[40,0,40,0],"-",[0,0,0,0],[0,0,0,0],[0,0,0,0],"-",[0,0,0,0]];
 
 var type = typeArray[0];
 var typeColor = typeColorArray[0]; 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 var tmpFolder ="~/Desktop/LIFT";
+
+
+var sendToPrinter = false;
+var printFolder="\\PC\printer";
+
 checkFolder (tmpFolder);
 
 function checkFolder (pathToFolder){
@@ -257,8 +262,12 @@ dropdown1.onChange= function(){
                     case 14 :  
                           type = typeArray[14];
                           typeColor = typeColorArray[14]; 
-                          break;            
-                    case 16 :  
+                          break;
+                    case 15 :  
+                          type = typeArray[14];
+                          typeColor = typeColorArray[14]; 
+                          break;          
+                    case 17 :  
                           type = prompt ("Введи название этого вида", undefined, "Другой вид");
                           typeColor = typeColorArray[16]; 
                           break;       
