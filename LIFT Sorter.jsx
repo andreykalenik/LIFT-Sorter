@@ -1,6 +1,22 @@
 ﻿#target indesign
 #targetengine "main"
 
+Array.prototype.map = function (callBack) {
+    const resultArray = [];
+  
+    if (typeof callBack !== "function") {
+        throw Error(callBack + " is not a function")
+    }
+    for (var i = 0; i < this.length; i++) {
+        resultArray.push(callBack(this[i], i, this));
+    }
+    return resultArray;
+}
+
+
+
+
+
 var pdfFiles = Folder.selectDialog().getFiles("*.pdf" || file.type == "PDF " );
 if(pdfFiles == "" || pdfFiles == null)  
   exit(0);
@@ -12,18 +28,114 @@ var label = false;
 var runKey = false;
 var timer = false;
 
+var type ;
+var typeColor; 
+var printFolder1;
+var printFolder2;
 
-var typeArray = ["День 1 Левая","День 1 Правая","-", "День 2 Левая","День 2 Правая","-","День 3 Левая","День 3 Правая","-","БЦ","элит","Общежитие","-","Жодино","Борисов","Барановичи","-","Другое"]; 
-var typeColorArray = [[40,0,0,0],[0,40,0,0],"-",[40,0,0,0],[0,40,0,0],"-",[40,0,0,0],[0,40,0,0],"-",[40,40,0,0],[0,40,40,0],[40,0,40,0],"-",[0,0,0,0],[0,0,0,0],[0,0,0,0],"-",[0,0,0,0]];
 
-var type = typeArray[0];
-var typeColor = typeColorArray[0]; 
+const types = [
+    {
+        name:"День 1 Левая",
+        color: [40,0,0,0],
+    },
+    {
+        name:"День 1 Правая",
+        color: [0,40,0,0],
+    },
+    {
+        name:"День 2 Левая",
+        color: [40,0,0,0],
+    },
+    {
+        name:"День 2 Правая",
+        color: [0,40,0,0],
+    },
+    {
+        name:"День 3 Левая",
+        color: [40,0,0,0],
+    },
+    {
+        name:"День 3 Правая",
+        color: [0,40,0,0],
+    },
+    {
+        name:"-",
+        color:"-",
+    },
+    {
+        name:"БЦ",
+        color: [40,40,0,0],
+    },
+    {
+        name:"Элит",
+        color: [0,40,40,0],
+    },
+    {
+        name:"Общежитие",
+        color: [40,0,40,0],
+    },
+    {
+        name:"-",
+        color:"-",
+    },
+    {
+        name:"Жодино",
+        color: [0,0,0,0],
+    },
+    {
+        name:"Борисов",
+        color: [0,0,0,0],
+    },
+    {
+        name:"Барановичи",
+        color: [0,0,0,0],
+    },
+    {
+        name:"-",
+        color:"-",
+    },
+    {
+        name:"Другое",
+        color: [0,0,0,0],
+    },
+]
+
+
+const printers = [
+    {
+        name:"KM 12000",
+        path1:"//PC/printer/LIFT_A3",
+        path2:"//PC/printer/LIFT_330x474",
+    },
+    {
+        name:"KM 6085 #1",
+        path1:"",
+        path2:"",
+    },
+    {
+        name:"KM 6085 #2",
+        path1:"",
+        path2:"",
+    },
+];
+
+
+const nanePrinterArray= printers.map(function (item) {return item.name})
+const path1PrinterArray= printers.map(function (item) {return item.path1})
+const path2PrinterArray= printers.map(function (item) {return item.path2})
+
+const typeArray = types.map(function (item) {return item.name})
+const typeColorArray = types.map(function (item) {return item.color})
+
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 var tmpFolder ="~/Desktop/LIFT";
 
 
-var sendToPrinter = false;
-var printFolder="\\PC\printer";
+var sendToPrinter = true;
+
+const regexp = new RegExp (/330|474/)
 
 checkFolder (tmpFolder);
 
@@ -109,10 +221,22 @@ var statictext1 = group1.add("statictext", undefined, undefined, {name: "statict
 
 var dropdown1_array = typeArray ; 
 var dropdown1 = group1.add("dropdownlist", undefined, undefined, {name: "dropdown1", items: dropdown1_array}); 
-    dropdown1.selection = 0; 
 var checkbox1 = group1.add("checkbox", undefined, undefined, {name: "checkbox1"}); 
     checkbox1.text = "Только этикетка"; 
     //checkbox1.enabled = false;
+if(sendToPrinter){
+    
+    var statictext100 = group1.add("statictext", undefined, undefined, {name: "statictext100"}); 
+    statictext100.text = "|"; 
+    
+    var statictext101 = group1.add("statictext", undefined, undefined, {name: "statictext101"}); 
+    statictext101.text = "Принтер"; 
+    
+
+    var dropdown2_array = nanePrinterArray ; 
+    var dropdown2 = group1.add("dropdownlist", undefined, undefined, {name: "dropdown2", items: dropdown2_array}); 
+
+    }
 // GROUP2
 // ======
 var group2 = dialog.add("group", undefined, {name: "group2"}); 
@@ -152,24 +276,7 @@ var edittext2 = group4.add('edittext {properties: {name: "edittext2", multiline:
     edittext2.text = page1; 
     edittext2.characters = 4;
 
-// GROUP5
-// ======
-/*
-var group5 = group2.add("group", undefined, {name: "group5"}); 
-    group5.orientation = "column"; 
-    group5.alignChildren = ["left","top"]; 
-    group5.spacing = 10; 
-    group5.margins = 0; 
 
-var statictext4 = group5.add("statictext", undefined, undefined, {name: "statictext4"}); 
-    statictext4.text = "стр2"; 
-
-var edittext3 = group5.add('edittext {properties: {name: "edittext3", multiline: true, scrollable: true}}'); 
-    edittext3.text = page2; 
-    edittext3.characters = 4;
-  */  
-// GROUP8
-// ======
 var group8 = group2.add("group", undefined, {name: "group8"}); 
     group8.orientation = "column"; 
     group8.alignChildren = ["left","fill"]; 
@@ -201,8 +308,18 @@ var group7 = dialog.add("group", undefined, {name: "group7"});
     group7.margins = 0; 
 
 var button1 = group7.add("button", undefined,  "Старт",  {name: "ok"}); 
+button1.enabled = false;
+
+/*
+var type ;
+var typeColor; 
+ */   
+
+
 
 //=======
+
+
 button1.onClick= function(){
     dialog.close ();
     if(label == true){
@@ -217,63 +334,29 @@ checkbox1.onClick= function(){
         label = false;
         }
             } 
-dropdown1.onChange= function(){
-               switch (this.selection.index){  
-                    case 0 :  
-                          type = typeArray[0];
-                          typeColor = typeColorArray[0]; 
-                          break;  
-                    case 1 :  
-                           type = typeArray[1];
-                          typeColor = typeColorArray[1]; 
-                          break;  
-                    case 3 :  
-                          type = typeArray[3];
-                          typeColor = typeColorArray[3]; 
-                          break;  
-                    case 4 :  
-                           type = typeArray[4];
-                          typeColor = typeColorArray[4]; 
-                          break;  
-                    case 6 :  
-                          type = typeArray[6];
-                          typeColor = typeColorArray[6]; 
-                          break;  
-                    case 7 :  
-                           type = typeArray[7];
-                          typeColor = typeColorArray[7]; 
-                          break;  
-                    case 9 :  
-                          type = typeArray[9];
-                          typeColor = typeColorArray[9]; 
-                          break;  
-                    case 10 :  
-                           type = typeArray[10];
-                          typeColor = typeColorArray[10]; 
-                          break;
-                    case 11 :  
-                          type = typeArray[11];
-                          typeColor = typeColorArray[11]; 
-                          break;  
-                    case 13 :  
-                           type = typeArray[13];
-                          typeColor = typeColorArray[13]; 
-                          break;     
-                    case 14 :  
-                          type = typeArray[14];
-                          typeColor = typeColorArray[14]; 
-                          break;
-                    case 15 :  
-                          type = typeArray[14];
-                          typeColor = typeColorArray[14]; 
-                          break;          
-                    case 17 :  
-                          type = prompt ("Введи название этого вида", undefined, "Другой вид");
-                          typeColor = typeColorArray[16]; 
-                          break;       
 
-                }
-            }
+
+dropdown1.onChange= function(){
+    
+    if(this.selection.index != typeArray.length - 1){
+       type = typeArray[this.selection.index];
+       typeColor = typeColorArray[this.selection.index];
+    } else {
+            type = prompt ("Введи название этого вида", undefined, "Другой вид");
+            typeColor = typeColorArray[this.selection.index]; 
+        }
+        if( type !=undefined){
+        button1.enabled = true;
+    }
+}
+
+dropdown2.onChange= function(){
+    
+   printFolder1 = path1PrinterArray[this.selection.index];
+   printFolder2 = path2PrinterArray[this.selection.index];
+   
+} 
+
 dialog.show();
 
 
@@ -289,11 +372,6 @@ if(runKey == true){
     
     for(var j = 0; j < sortName.length-1; j++){
         getSizePDF (pdfFiles[j]);
-        /*
-        $.writeln ("файл " +j);
-        $.writeln ("sortPage1 " +sortPage1[j]);
-        $.writeln ("sortPage2 " +sortPage2[j]);
-        */
         if (sortPage1[j]>0 ){
             pagesPDF=2;
                 }
@@ -324,6 +402,8 @@ if(runKey == true){
             app.pdfPlacePreferences.pageNumber = a;
             myDocument.pages[a-1].place(File(pdfFiles[j]), [0,0]); 
             }
+        
+
          myDocument.colors.add({name : "BG", colorValue : typeColor , model : ColorModel.PROCESS ,space : ColorSpace.CMYK });
 
                     var myTextFrame = myDocument.pages[0].textFrames.add();
@@ -353,6 +433,21 @@ if(runKey == true){
                 pdfExportSet ();
                 var saveFile = new File(File(tmpFolder +"/"+ sortName[j] +".pdf"));  
                 myDocument.exportFile(ExportFormat.pdfType, saveFile, false);   
+                var pdf = File (File(tmpFolder +"/"+ sortName[j] +".pdf"))
+                
+                if(sendToPrinter){
+                    
+                if(Boolean (sortSize[j].match (regexp))){
+                    
+                      pdf.copy(printFolder2+"/"+ sortName[j] +".pdf")
+                      
+                    } else {
+                        
+                        pdf.copy(printFolder1+"/"+ sortName[j] +".pdf")
+                        
+                        }
+                }
+
                 myDocument.close(SaveOptions.no);
 
         }
@@ -568,3 +663,4 @@ function pdfExportSet (){
     }
     
 }
+
